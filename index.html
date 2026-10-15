@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sana bir mektubum var</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gece: #1d2742;
+    --gece-ust: #2c3a5e;
+    --zarf: #e6dcc8;
+    --zarf-koyu: #cfc2a8;
+    --kagit: #fcfaf4;
+    --muhur: #8a3350;
+    --yazi: #2b2b3a;
+    --soluk: #aab3cc;
+    --el: "Caveat", "Segoe Script", "Bradley Hand", cursive;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(ellipse at 50% 20%, var(--gece-ust), var(--gece) 70%);
+    color: var(--soluk);
+    font-family: var(--el);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2.2rem; padding: 1.5rem;
+    padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    overflow: hidden;
+  }
+  h1 { font-weight: 400; font-size: clamp(2rem, 6vw, 2.8rem); margin: 0; color: #f1ecdf; text-align: center; }
+  .ipucu { font-size: 1.4rem; margin: 0; transition: opacity .4s; }
+  body.acik .ipucu { opacity: 0; }
+
+  /* ---- Zarf ---- */
+  .zarf {
+    position: relative; width: min(340px, 84vw); aspect-ratio: 3 / 2;
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit;
+    margin-top: 3rem;
+  }
+  .zarf:focus-visible { outline: 3px solid #f1ecdf; outline-offset: 10px; border-radius: 6px; }
+  .zarf > * { position: absolute; }
+  .arka { inset: 0; background: var(--zarf-koyu); border-radius: 6px; z-index: 0; }
+  .kagit {
+    left: 7%; right: 7%; top: 6%; height: 88%;
+    background: var(--kagit); border-radius: 3px; z-index: 2;
+    transition: transform .9s cubic-bezier(.3,.7,.3,1) .45s;
+    box-shadow: 0 -1px 6px rgba(0,0,0,.15);
+  }
+  .on {
+    inset: 0; z-index: 3; background: var(--zarf); border-radius: 6px;
+    clip-path: polygon(0 0, 50% 56%, 100% 0, 100% 100%, 0 100%);
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
+  }
+  .kapak {
+    left: 0; right: 0; top: 0; height: 58%; z-index: 4;
+    background: #d9ccb2; clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    transition: transform .55s ease, z-index 0s .28s;
+  }
+  .muhur {
+    left: 50%; top: 46%; width: 15%; aspect-ratio: 1; z-index: 5;
+    transform: translate(-50%, -50%); border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #b04a69, var(--muhur) 65%);
+    box-shadow: 0 2px 5px rgba(0,0,0,.4);
+    display: grid; place-items: center; color: #f6dfe6; font-size: 1.5rem;
+    transition: opacity .25s;
+  }
+  body.acik .kapak { transform: rotateX(180deg); z-index: 1; }
+  body.acik .muhur { opacity: 0; }
+  body.acik .kagit { transform: translateY(-62%); }
+
+  /* ---- Mektup (okuma alanı) ---- */
+  .okuma {
+    position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+    padding: 1rem; background: rgba(20, 26, 46, .82);
+    opacity: 0; visibility: hidden; transition: opacity .5s, visibility 0s .5s;
+  }
+  .okuma.goster { opacity: 1; visibility: visible; transition: opacity .5s; }
+  .mektup {
+    position: relative; width: min(560px, 100%); max-height: 88vh; max-height: 88dvh;
+    overflow-y: auto; background: var(--kagit); color: var(--yazi);
+    padding: 2rem 1.6rem 1.6rem 3.2rem; border-radius: 4px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.5);
+    background-image:
+      linear-gradient(to right, transparent 2.4rem, #d9a3b3 2.4rem, #d9a3b3 calc(2.4rem + 1px), transparent calc(2.4rem + 1px)),
+      repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.7em - 1px), #e4e0d2 calc(1.7em - 1px), #e4e0d2 1.7em);
+    background-attachment: local;
+    transform: translateY(24px) scale(.96); transition: transform .6s cubic-bezier(.3,.7,.3,1);
+  }
+  .okuma.goster .mektup { transform: none; }
+  .mektup p { margin: 0 0 1.7em; font-size: clamp(1.35rem, 4.2vw, 1.7rem); line-height: 1.7; }
+  .mektup .imza { text-align: right; margin-bottom: 1rem; }
+  .kapat {
+    display: block; margin: 0 auto; padding: .4rem 1.2rem; font: inherit; font-size: 1.35rem;
+    color: var(--yazi); background: transparent; border: 1.5px solid var(--yazi);
+    border-radius: 999px; cursor: pointer;
+  }
+  .kapat:hover { background: var(--yazi); color: var(--kagit); }
+  .kapat:focus-visible { outline: 3px solid var(--muhur); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .01s !important; transition-delay: 0s !important; }
+  }
+</style>
+</head>
+<body>
+  <h1>Sana bir mektubum var</h1>
+
+  <button class="zarf" id="zarf" aria-label="Zarfı aç">
+    <span class="arka"></span>
+    <span class="kagit"></span>
+    <span class="on"></span>
+    <span class="kapak"></span>
+    <span class="muhur" aria-hidden="true">♥</span>
+  </button>
+
+  <p class="ipucu">Zarfa dokun</p>
+
+  <!-- MEKTUBU BURADAN DEĞİŞTİREBİLİRSİN -->
+  <div class="okuma" id="okuma" role="dialog" aria-modal="true" aria-label="Mektup">
+    <div class="mektup">
+      <p>Sevgili Gülüşü Çiçek Açtıran Hanımefendi,</p>
+      <p>Bugünün ne kadar uzun ve yorucu geçtiğini biliyorum. Bazı günler her şey üst üste biner, insan nefes almayı bile unutur.</p>
+      <p>Ama bak, buraya kadar geldin. Hepsini taşıdın ve hâlâ ayaktasın. Bu küçük bir şey değil.</p>
+      <p>Şimdi bir an dur. Omuzlarını bırak, derin bir nefes al. Yapılmayan işler yarın da yerinde olacak; sen bu akşam biraz dinlenmeyi hak ediyorsun.</p>
+      <p>Yarın daha hafif bir gün olabilir. Olmasa bile, seni düşünen biri olduğunu unutma.</p>
+      <p class="imza">Sevgiyle,<br>Oğuzhan</p>
+      <button class="kapat" id="kapat">Zarfa geri koy</button>
+    </div>
+  </div>
+
+<script>
+  const zarf = document.getElementById('zarf');
+  const okuma = document.getElementById('okuma');
+  const kapat = document.getElementById('kapat');
+  let zamanlayici;
+
+  function ac() {
+    document.body.classList.add('acik');
+    zarf.setAttribute('aria-label', 'Mektubu oku');
+    clearTimeout(zamanlayici);
+    zamanlayici = setTimeout(oku, 1500);
+  }
+  function oku() {
+    okuma.classList.add('goster');
+    kapat.focus();
+  }
+  function geriKoy() {
+    okuma.classList.remove('goster');
+    document.body.classList.remove('acik');
+    zarf.setAttribute('aria-label', 'Zarfı aç');
+    zarf.focus();
+  }
+
+  zarf.addEventListener('click', () => {
+    if (!document.body.classList.contains('acik')) ac(); else oku();
+  });
+  kapat.addEventListener('click', geriKoy);
+  okuma.addEventListener('click', e => { if (e.target === okuma) geriKoy(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && okuma.classList.contains('goster')) geriKoy(); });
+</script>
+</body>
+</html>
